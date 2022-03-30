@@ -6,7 +6,7 @@
   средний опыт работы в профессии - 27 лет</p>
       <div class="slider_case container">
           <v-slider v-bind="options">
-            <div class="item user" v-for="user in users" :key="user.id" @click="loadPosts(user)">
+            <div class="item user" v-for="user in users" :key="user.id" @click="loadPostsAndChangeColor(user, $event.target)">
               <img class="user_image" :src="user.image">
               <div class="user_name">
                 {{ user.name }}
@@ -86,13 +86,28 @@ export default {
       'v-slider': slider,
   },
   methods: {
-    loadPosts(user) {
+    loadPostsAndChangeColor(user, target) {
+      // console.log(target)
       this.nameUser = user.name
       if (this.page === 10) {
         this.page = 1
       } else {
         this.page = this.page + 1
       }
+      let allUsers = document.getElementsByClassName('user')
+      for (let i = 0; i < allUsers.length; i++) {
+        if (allUsers[i].childNodes[1].classList.contains('active-color')) {
+          allUsers[i].childNodes[1].classList.remove('active-color')
+          allUsers[i].childNodes[2].classList.remove('active-color')
+        }
+      }
+      if (target.classList.contains('user')) {
+        target = target
+      } else {
+        target = target.parentElement
+      }
+      target.childNodes[1].classList.add('active-color')
+      target.childNodes[2].classList.add('active-color')
       this.fetchPosts()
     },
     async fetchUsers() {
@@ -129,10 +144,16 @@ export default {
       let rand = 320 + Math.random() * (400 + 1 - 320);
       return `https://i.pravatar.cc/${Math.floor(rand)}`
     },
+    setActiveColor() {
+      let userFirst = document.getElementsByClassName('user')[0]
+      userFirst.childNodes[1].classList.add('active-color')
+      userFirst.childNodes[2].classList.add('active-color')
+    },
   },
   mounted() {
       this.fetchUsers()
       this.fetchPosts()
+      setTimeout(() => this.setActiveColor(), 500)
   },
 }
 
@@ -209,6 +230,7 @@ body {
 .user {
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .posts_title, .post {
@@ -302,5 +324,57 @@ body {
 .animate-leave-to {
   opacity: 0;
   transform: translateY(30px);
+}
+
+.active-color {
+  color: #FE8700;
+}
+
+@media screen and (max-width: 500px)  {
+  .page {
+    margin: 40px 0 10px;
+  }
+  .bloggers {
+    background: transparent url(img/background.png) no-repeat right bottom;
+  }
+  .bloggers_title {
+    font-size: 38px;
+    line-height: 38px;
+    margin-bottom: 25px;
+  }
+  .bloggers_description {
+    font-size: 16px;
+    line-height: 20px;
+  }
+  .posts_title {
+    width: 100%;
+    margin: 50px 0 30px;
+    font-size: 38px;
+    line-height: 38px;
+  }
+  .post {
+    width: 100%;
+  }
+  .posts_title:before {
+    content: '';
+    width: 50px;
+    height: 39px;
+    left: 0;
+    top: -49px;
+    position: absolute;
+    background:transparent url(img/quotes.svg) no-repeat center /100% ; 
+  }
+  .post_title {
+    font-size: 22px;
+    line-height: 24px;
+    margin-bottom: 5px;
+  }
+  .post_body {
+    font-size: 18px;
+    line-height: 24px;
+  }
+  .posts .container {
+    padding-bottom: 250px;
+  }
 }
 </style>
