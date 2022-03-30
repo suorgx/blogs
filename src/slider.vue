@@ -8,7 +8,6 @@
             </div>
         </div>
         <ul v-if="dots" class="v_slider__dots">
-            
             <li v-for="n in numDot" @click="setDot(n)" :class="{'active': n == numDotActive}" :key="n">
                 <span></span>
             </li>
@@ -20,67 +19,56 @@
     export default {
         name: 'slider',
         props: {
-            // Количество слайдов на странице
             items: {
                 type: Number,
                 default: 3
             },
 
-            // Отступы
             margin: {
                 type: Number,
-                default: 20
+                default: 0
             },
 
-            // Навигация
             nav: {
                 type: Boolean,
                 default: false
             },
 
-            // Точечная навигация
             dots: {
                 type: Boolean,
                 default: false
             },
 
-            // Перемотка
             loop: {
                 type: Boolean,
                 default: false
             },
 
-            // Кнопка назад
             prevNav: {
                 type: String,
                 default: ''
             },
 
-            // Кнопка веред
             nextNav: {
                 type: String,
                 default: ''
             },
 
-            // Скорость перелистывания (мс)
             speed: {
                 type: Number,
                 default: 300
             },
 
-            // Анимация перехода (linear, ease-in, ease-out, ease-in-out)
             timing: {
                 type: String,
                 default: 'ease'
             },
 
-            // Количество смещаемых слайдов
             offset: {
                 type: Number,
                 default: 1
             },
 
-            // Переключение слайдов соседними блоками
             sibling: {
                 type: Boolean,
                 default: false
@@ -108,28 +96,20 @@
                     track: 0
                 },
 
-                // Первый слайд
                 itemActive: 0,
 
-                // Общее количество реальных слайдов
                 numItemReal: 0,
 
-                // Общее количество слайдов с клонами
                 numItemAll: 0,
 
-                // Список медиа запросов
                 breakpoints: [],
 
-                // Количество
                 numDot: 0,
 
-                // Активный дот
                 numDotActive: 0,
 
-                // Сдвиг по оси Y
                 transform: 0,
 
-                // Свойства слайдера
                 settings: {
                     items: this.items,
                     margin: this.margin,
@@ -144,13 +124,10 @@
                     responsive: this.responsive
                 },
 
-                // Флаг назатия мыши
                 mouseDown: false,
                 
-                // Дистанция для свайпа
                 swipeDistance: 50,
 
-                // Дистанция перемещения курсора
                 dragDistance: 0 
             }
         },
@@ -158,24 +135,18 @@
         mounted () {
             this.$nextTick(function () {
 
-                // Объект контейнера
                 this.el.list = this.$refs.list
 
-                // Объект трека
                 this.el.track = this.$refs.track
                 
-                // Объекты слайдов
                 this.el.slides = this.el.track.children
 
-                // Вычисление количества слайдов
                 this.numItemReal = this.el.slides.length
 
-                // Присваиваем класс слайдам
                 for (let i = 0; i < this.numItemReal; ++i) {
                     this.el.slides[i].classList.add('v_slider__item')
                 }
 
-                // Добавляем клоны
                 if (this.settings.loop) {
                     let lastSlide = this.el.track.getElementsByClassName('v_slider__item')
                     for (let i = 0; i < this.numItemReal; ++i) {
@@ -190,17 +161,14 @@
                     }
                 }
 
-                // Вычисляем общее количество слайдов
                 if (this.settings.loop) {
                     this.numItemAll = this.numItemReal * 3
                 } else {
                     this.numItemAll = this.numItemReal
                 }
 
-                // Обновление при изменении экрана
                 window.addEventListener('resize', this.getWidthDocument)
 
-                // Вешаем обработчиски событий на действия мыши
                 if ('ontouchstart' in window) {
                     this.el.track.addEventListener('touchstart', this.handleMouseDown)
                     this.el.track.addEventListener('touchend', this.handleMouseUp)
@@ -211,7 +179,6 @@
                     this.el.track.addEventListener('mousemove', this.handleMouseMove)
                 }
 
-                // Вычисляем ширину окна
                 this.getWidthDocument()
             })
         },
@@ -231,12 +198,10 @@
         },
 
         methods: {
-            // Размер окна браузера
             getWidthDocument () {
                 this.width.document = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
             },
 
-            // Размеры слйдов и трека
             getWidth () {
                 this.width.container = this.el.list.clientWidth
                 if(this.settings.items == 1) {
@@ -249,12 +214,10 @@
             },
 
             reload () {
-                // вычисляем брейкпоинты
                 if(this.responsive){
                     this.breakpoints = Object.keys(this.responsive)
                 }
 
-                // Устанавливаем свойства при отзывчивости
                 if(this.breakpoints){
                     this.breakpoints.forEach((width) => {
                         if(width <= this.width.document){
@@ -265,42 +228,34 @@
                     })
                 }
 
-                // Вычисляем размеры 
                 this.getWidth()
 
-                // Вычисляем отступы
                 if(this.settings.items == 1) {
                     this.settings.margin = 0
                 } else{
                     this.settings.margin = this.margin
                 }
 
-                // Устанавливаем размеры
                 for (let i = 0; i < this.numItemAll; ++i) {
                     this.el.slides[i].style.width = this.width.slide + 'px'
                     this.el.slides[i].style.marginRight = this.settings.margin + 'px'
                 }
 
-                // Удаляем активные слайды
                 for (let i = 0; i < this.numItemAll - 1; ++i) {
                     this.el.slides[i].classList.remove('active')
                 }
 
-                // Устанавливаем трек и назначаем активные слайды
                 if (this.settings.loop) {
                     this.transform = this.numItemReal * (this.width.slide + this.settings.margin)
                 } else {
                     this.transform = 0
                 }
 
-                // Устанавливаем активные слайды
                 this.addActiveClass(this.itemActive)
 
-                // Вычисляем количество дотов
                 this.numDot = Math.ceil(this.numItemReal / this.settings.items)
             },
 
-            // Установка активнго слайда
             addActiveClass (value) {
                 if (this.settings.loop) {
                     value += this.numItemReal
@@ -315,15 +270,12 @@
                 }
             },
 
-
-            // Перемещение слайдера
             setSlide (n, transition = true) {
                 // Удаляем активный слайд
                 for (let i = 0; i < this.numItemAll - 1; ++i) {
                     this.el.slides[i].classList.remove('active', 'super')
                 }
 
-                // Перелистывание слайдера
                 if (this.settings.loop) {
                     this.transform = (n + this.numItemReal - 1) * (this.width.slide + this.settings.margin)
                 } else {
@@ -331,7 +283,6 @@
                 }
                 this.transform += (this.width.slide + this.settings.margin)
 
-                // Отключение анимации
                 if (!transition) {
                     this.settings.speed = 0
                 } else {
@@ -368,17 +319,14 @@
                 }
             },
 
-            // Следующий слайдер
             nextSlide () {
                 this.setSlide(this.itemActive + this.settings.offset)
             },
 
-            // Предидущий слайдер
             prevSlide () {
                 this.setSlide(this.itemActive - this.settings.offset)
             },
 
-            // Переключение дотами
             setDot(n) {
                 if (this.settings.loop) {
                     this.setSlide((n - 1) * (this.settings.items))
@@ -397,7 +345,6 @@
             },
 
 
-            // Действия мыши
             handleMouseDown (e) {
                 if (!e.touches) {
                     e.preventDefault()
@@ -460,7 +407,6 @@
 
         updated: function () {
             this.$nextTick(function () {
-                // Вычисляем активный дот
                 if (this.settings.loop) {
                     this.numDotActive = Math.ceil(this.itemActive / this.settings.items + 0.1)
                 } else {
@@ -476,16 +422,12 @@
                     }
                 }
 
-
-                // Переключение соседними слайдами
                 if(this.sibling) {
                     this.el.activeItem = this.$el.getElementsByClassName('v_slider__track')[0]
-
                     for (let i = 0; i < this.el.activeItem.children.length; ++i) {
                         this.el.activeItem.children[i].removeEventListener('click', this.nextSlide)
                         this.el.activeItem.children[i].removeEventListener('click', this.prevSlide)
                     }
-
                     this.el.activeItem = this.el.activeItem.getElementsByClassName('super')[0]
                     this.el.activeItem.nextElementSibling.addEventListener('click', this.nextSlide)
                     this.el.activeItem.previousElementSibling.addEventListener('click', this.prevSlide)
@@ -494,7 +436,6 @@
         }
     }
 </script>
-
 
 <style>
     .v_slider { 
@@ -537,13 +478,21 @@
     .v_slider__prev,
     .v_slider__next { 
         outline: none; 
-        background:#FE8700; 
-        padding: 8px 10px; 
         color:#fff; 
         font-size: 20px; 
-        opacity: 0.9; 
         border: none; 
-        border-radius: 50%; 
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        margin: 0 9.5px 20px;
+        z-index: 1;
+    }
+    .v_slider__prev {
+        background:transparent url(img/left.svg) no-repeat center /100% ; 
+    }
+
+    .v_slider__next {
+        background:transparent url(img/right.svg) no-repeat center /100% ; 
     }
     .v_slider__prev:hover,
     .v_slider__next:hover { 
