@@ -235,7 +235,7 @@ body {
 
 .posts_title, .post {
   width: 68vw;
-  align-self: end;
+  align-self: flex-end;
   text-align: left;
 }
 
