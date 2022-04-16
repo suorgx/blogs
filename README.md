@@ -1,5 +1,3 @@
-# inbisyst
-
 ## Project setup
 ```
 npm install
